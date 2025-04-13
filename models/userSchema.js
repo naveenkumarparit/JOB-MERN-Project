@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs"; // Use bcryptjs instead of bcrypt
 import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema({
@@ -40,12 +40,22 @@ const userSchema = new mongoose.Schema({
 // Hash password before saving
 userSchema.pre("save", async function(next) {
     if (!this.isModified("password")) return next();
-    this.password = await bcrypt.hash(this.password, 10);
+    try {
+        // Hash the password only if it is modified
+        this.password = await bcrypt.hash(this.password, 10);
+        next();
+    } catch (error) {
+        next(error);
+    }
 });
 
-// Compare entered password
+// Compare entered password with the stored password
 userSchema.methods.comparePassword = async function(enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
+    try {
+        return await bcrypt.compare(enteredPassword, this.password);
+    } catch (error) {
+        throw new Error("Password comparison failed");
+    }
 };
 
 // Generate JWT token
