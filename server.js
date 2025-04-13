@@ -2,6 +2,7 @@ import app from "./app.js";
 import dotenv from "dotenv";
 import cloudinary from "cloudinary";
 import mongoose from "mongoose";
+import bcrypt from 'bcryptjs'; // Import bcryptjs here
 
 // ✅ Load environment variables from config.env
 dotenv.config({ path: "./.env" });
